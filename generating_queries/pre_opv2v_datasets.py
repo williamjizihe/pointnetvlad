@@ -203,9 +203,10 @@ def main():
                     img_non_ground = preprocessor.preprocess(pcd)
 
                     # 将处理后的雷达数据保存为.bin文件
-                    if os.path.exists(f"{bin_folder}/pointcloud"):
-                        os.makedirs(f"{bin_folder}/pointcloud")
-                    bin_filepath = f"{bin_folder}/pointcloud/{timestamp}.bin"
+                    pointcloud_folder = os.path.join(bin_folder, 'pointcloud')
+                    if not os.path.exists(pointcloud_folder):
+                        os.makedirs(pointcloud_folder)
+                    bin_filepath = f"{pointcloud_folder}/{timestamp}.bin"
                     print(f"Bin file path: {bin_filepath}")
                     img_non_ground['bev_input'].astype(np.float32).tofile(bin_filepath)
 
