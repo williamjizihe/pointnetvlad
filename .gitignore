@@ -1,0 +1,10 @@
+*.pyc
+*.pickle
+*.zip
+*.ipynb
+log*
+results*
+/benchmark_datasets
+/bindatasets
+/mydatasets
+/models
