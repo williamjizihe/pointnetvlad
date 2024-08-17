@@ -203,9 +203,10 @@ def main():
                     img_non_ground = preprocessor.preprocess(pcd)
 
                     # 将处理后的雷达数据保存为.bin文件
-                    bin_filepath = f"{bin_folder}/{timestamp}.bin"
+                    if os.path.exists(f"{bin_folder}/pointcloud"):
+                        os.makedirs(f"{bin_folder}/pointcloud")
+                    bin_filepath = f"{bin_folder}/pointcloud/{timestamp}.bin"
                     print(f"Bin file path: {bin_filepath}")
-                    print(f"Bin folder: {bin_folder}")  
                     img_non_ground['bev_input'].astype(np.float32).tofile(bin_filepath)
 
                     # 记录timestamp和真实坐标到csv

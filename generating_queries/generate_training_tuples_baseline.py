@@ -7,13 +7,12 @@ import pickle
 import random
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-base_path = "../benchmark_datasets/"
+base_path = "../bindatasets/"
 
-runs_folder= "oxford/"
-filename = "pointcloud_locations_20m_10overlap.csv"
-pointcloud_fols="/pointcloud_20m_10overlap/"
+filename = "lidar_data.csv"
+pointcloud_fols="/pointcloud/"
 
-all_folders=sorted(os.listdir(os.path.join(BASE_DIR,base_path,runs_folder)))
+all_folders=sorted(os.listdir(os.path.join(BASE_DIR,base_path)))
 
 folders=[]
 
@@ -45,9 +44,9 @@ def check_in_test_set(northing, easting, points, x_width, y_width):
 
 
 def construct_query_dict(df_centroids, filename):
-	tree = KDTree(df_centroids[['northing','easting']])
-	ind_nn = tree.query_radius(df_centroids[['northing','easting']],r=10)
-	ind_r = tree.query_radius(df_centroids[['northing','easting']], r=50)
+	tree = KDTree(df_centroids[['x','y']])
+	ind_nn = tree.query_radius(df_centroids[['x','y']],r=10)
+	ind_r = tree.query_radius(df_centroids[['x','y']], r=50)
 	queries={}
 	for i in range(len(ind_nn)):
 		query=df_centroids.iloc[i]["file"]
@@ -57,22 +56,22 @@ def construct_query_dict(df_centroids, filename):
 		queries[i]={"query":query,"positives":positives,"negatives":negatives}
 
 	with open(filename, 'wb') as handle:
-	    pickle.dump(queries, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
+		pickle.dump(queries, handle, protocol=pickle.HIGHEST_PROTOCOL)
+		
 	print("Done ", filename)
 
 
 ####Initialize pandas DataFrame
-df_train= pd.DataFrame(columns=['file','northing','easting'])
-df_test= pd.DataFrame(columns=['file','northing','easting'])
+df_train= pd.DataFrame(columns=['file','x','y'])
+df_test= pd.DataFrame(columns=['file','x','y'])
 
 for folder in folders:
-	df_locations= pd.read_csv(os.path.join(base_path,runs_folder,folder,filename),sep=',')
-	df_locations['timestamp']=runs_folder+folder+pointcloud_fols+df_locations['timestamp'].astype(str)+'.bin'
+	df_locations= pd.read_csv(os.path.join(base_path,folder,filename),sep=',')
+	df_locations['timestamp']=folder+pointcloud_fols+df_locations['timestamp'].astype(str)+'.bin'
 	df_locations=df_locations.rename(columns={'timestamp':'file'})
 	
 	for index, row in df_locations.iterrows():
-		if(check_in_test_set(row['northing'], row['easting'], p, x_width, y_width)):
+		if(check_in_test_set(row['x'], row['y'], p, x_width, y_width)):
 			df_test=df_test.append(row, ignore_index=True)
 		else:
 			df_train=df_train.append(row, ignore_index=True)
